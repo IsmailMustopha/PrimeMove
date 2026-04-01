@@ -1,9 +1,19 @@
-import React from 'react'
+"use client";
+import React, { useState } from "react";
+import HeroSection from "@/app/HeroSection";
+import VehicleSlider from "@/app/VehicleSlider";
+import AuthModal from "@/app/AuthModal";
 
-const PublicHome = () => {
+function PublicHome() {
+  const [authOpen, setAuthOpen] = useState(false);
+
   return (
-    <div>PublicHome</div>
-  )
+    <>
+      <HeroSection />
+      <VehicleSlider />
+      <AuthModal open={authOpen} onClose={() =>  setAuthOpen(false)} />
+    </>
+  );
 }
 
-export default PublicHome
+export default PublicHome;
