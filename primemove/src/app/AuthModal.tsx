@@ -53,8 +53,11 @@ function AuthModal({ open, onClose }: propType) {
         otp: otp.join(""),
       });
       console.log(data);
+      setOtp(["", "", "", "", "", ""]);
+      setEmail("")
       setStep("login");
       setLoading(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setLoading(false);
       setErr(error.response.data.message ?? "something went wrong");
