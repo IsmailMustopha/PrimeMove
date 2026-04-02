@@ -14,7 +14,7 @@ type propType = {
 type stepType = "login" | "signup" | "otp";
 
 function AuthModal({ open, onClose }: propType) {
-  const [step, setStep] = useState<stepType>("signup");
+  const [step, setStep] = useState<stepType>("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +45,22 @@ function AuthModal({ open, onClose }: propType) {
     }
   };
   
+  const handleVerifyEmail = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.post("/api/auth/verify-email", {
+        email,
+        otp: otp.join(""),
+      });
+      console.log(data);
+      setStep("login");
+      setLoading(false);
+    } catch (error: any) {
+      setLoading(false);
+      setErr(error.response.data.message ?? "something went wrong");
+    }
+  };
+
   const handleLogin = async () => {
     setLoading(true);
     const res = await signIn("credentials", {
@@ -285,8 +301,22 @@ function AuthModal({ open, onClose }: propType) {
                       ))}
                     </div>
 
-                    <button className="mt-6 w-full h-11 rounded-xl bg-black text-white font-semibold hover:bg-gray-900 transition">
-                      Verify and Create Account
+                    {err && <p className="text-red-500">*{err}</p>}
+
+                    <button
+                      onClick={handleVerifyEmail}
+                      className="mt-6 w-full h-11 rounded-xl bg-black text-white font-semibold hover:bg-gray-900 transition"
+                      disabled={loading}
+                    >
+                      {!loading ? (
+                        "Verify and Create Account"
+                      ) : (
+                        <CircleDashed
+                          size={18}
+                          color="white"
+                          className="animate-spin"
+                        />
+                      )}
                     </button>
                   </motion.div>
                 )}
