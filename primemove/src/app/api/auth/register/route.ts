@@ -1,4 +1,5 @@
 import connectDb from "@/lib/db";
+import { sendMail } from "@/lib/SendMail";
 import User from "@/models/user.model";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
@@ -45,12 +46,12 @@ export async function POST(req: NextRequest) {
         otpExpiresAt,
       });
     }
-
-    user = await User.create({
-      name,
+    
+    await sendMail(
       email,
-      password: hashedPassword,
-    });
+      "Your OTP for Email Verification",
+      `<h2>Your Email Verification OTP is <strong>${otp}</strong></h2>`,
+    );
 
     return NextResponse.json(user, { status: 201 });
   } catch (error) {

@@ -1,93 +1,33 @@
-// "use client";
-// import React from "react";
-// import { motion, AnimatePresence } from "framer-motion";
-// import Image from "next/image";
-// import Link from "next/link";
-// import { usePathname } from "next/navigation";
-
-// const NAV_ITEMS = [
-//   { name: "Home", href: "/" },
-//   { name: "Bookings", href: "/bookings" },
-//   { name: "About Us", href: "/about-us" },
-//   { name: "Contact", href: "/contact" },
-// ];
-
-// function Nav() {
-//   const pathName = usePathname();
-
-//   return (
-//     <motion.div
-//       initial={{ y: -100, x: "-50%", opacity: 0 }}
-//       animate={{ y: 0, x: "-50%", opacity: 1 }}
-//       transition={{ duration: 0.5, ease: "easeOut" }}
-//       className="fixed top-5 left-1/2 w-[95%] md:w-fit z-50 rounded-full bg-[#0B0B0B]/80 backdrop-blur-md border border-white/10 text-white shadow-[0_20px_50px_rgba(0,0,0,0.5)] px-2 py-2"
-//     >
-//       <div className="flex items-center gap-8 md:gap-12 px-2 md:px-4">
-//         {/* Logo */}
-//         <Link href="/" className="hover:opacity-80 transition-opacity">
-//           <Image
-//             src="/logo.png"
-//             alt="logo"
-//             width={36}
-//             height={36}
-//             className="rounded-full"
-//             priority
-//           />
-//         </Link>
-
-//         {/* Navigation Links */}
-//         <nav className="hidden md:flex items-center gap-2">
-//           {NAV_ITEMS.map((item) => {
-//             const isActive = pathName === item.href;
-
-//             return (
-//               <Link
-//                 key={item.name}
-//                 href={item.href}
-//                 className={`relative px-4 py-2 text-sm font-medium transition-colors duration-300 ${
-//                   isActive ? "text-white" : "text-gray-400 hover:text-white"
-//                 }`}
-//               >
-//                 <span className="relative z-10">{item.name}</span>
-//                 {isActive && (
-//                   <motion.div
-//                     layoutId="nav-pill"
-//                     transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
-//                     className="absolute inset-0 bg-white/10 rounded-full"
-//                   />
-//                 )}
-//               </Link>
-//             );
-//           })}
-//         </nav>
-
-//         {/* Action Button */}
-//         <button className="group relative flex items-center justify-center px-6 py-2 rounded-full bg-white text-black text-sm font-semibold overflow-hidden transition-all hover:pr-8 active:scale-95">
-//           <span className="relative z-10">Login</span>
-//           <span className="absolute right-3 opacity-0 translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0">
-//             →
-//           </span>
-//         </button>
-//       </div>
-//     </motion.div>
-//   );
-// }
-
-// export default Nav;
-
 "use client";
 import React, { useState } from "react";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AuthModal from "@/app/AuthModal";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { Bike, Car, ChevronRight, LogOut, Menu, Truck, X } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { setUserData } from "@/redux/userSlice";
 
 const Nav_Items = ["Home", "Bookings", "About Us", "Contact"];
 
 function Nav() {
   const pathName = usePathname();
   const [authOpen, setAuthOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const { userData } = useSelector((state: RootState) => state.user);
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const handleLogOut = async () => {
+    await signOut({ redirect: false });
+    dispatch(setUserData(null));
+    setProfileOpen(false);
+  };
 
   return (
     <>
@@ -126,14 +66,212 @@ function Nav() {
             })}
           </div>
 
+          <div className="flex items-center gap-3 relative">
+            <div className="hidden md:block relative">
+              {!userData ? (
+                <button
+                  className="px-4 py-1.5 rounded-full bg-white text-black text-sm"
+                  onClick={() => setAuthOpen(true)}
+                >
+                  Login
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="w-11 h-11 rounded-full bg-white text-black font-bold"
+                    onClick={() => setProfileOpen((p) => !p)}
+                  >
+                    {userData.name.charAt(0).toUpperCase()}
+                  </button>
+
+                  <AnimatePresence>
+                    {profileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute top-14 right-0 w-[300px] bg-white text-black rounded-2xl shadow-xl border"
+                      >
+                        <div className="p-5">
+                          <p className="font-semibold text-lg">
+                            {userData.name}
+                          </p>
+                          <p className="text-xs uppercase text-gray-500 mb-4">
+                            {userData.role}
+                          </p>
+                          {userData.role !== "partner" && (
+                            <div className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl">
+                              <div className="flex -space-x-2">
+                                <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
+                                  <Bike size={14} />
+                                </div>
+                                <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
+                                  <Car size={14} />
+                                </div>
+                                <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
+                                  <Truck size={14} />
+                                </div>
+                              </div>
+                              Become a Partner
+                              <ChevronRight size={16} className="ml-auto" />
+                            </div>
+                          )}
+
+                          <button
+                            className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl mt-2"
+                            onClick={handleLogOut}
+                          >
+                            <LogOut size={16} />
+                            Logout
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </>
+              )}
+            </div>
+
+            <div className="md:hidden">
+              {!userData ? (
+                <button
+                  className="px-4 py-1.5 rounded-full bg-white text-black text-sm"
+                  onClick={() => setAuthOpen(true)}
+                >
+                  Login
+                </button>
+              ) : (
+                <>
+                  <button
+                    className="w-11 h-11 rounded-full bg-white text-black font-bold"
+                    onClick={() => setProfileOpen((p) => !p)}
+                  >
+                    {userData.name.charAt(0).toUpperCase()}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
           <button
-            className="px-4 py-1.5 rounded-full bg-white text-black text-sm"
-            onClick={() => setAuthOpen(true)}
+            className="md:hidden text-white"
+            onClick={() => setMenuOpen((p) => !p)}
           >
-            Login
+            {menuOpen ? <X size={26} /> : <Menu size={26} />}
           </button>
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            {/* Background Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMenuOpen(false)}
+              className="fixed inset-0 bg-black z-30 md:hidden"
+            />
+
+            {/* Menu Content Container */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="
+        fixed top-[85px] left-1/2 -translate-x-1/2 
+        w-[92%] 
+        bg-[#0B0B0B] 
+        rounded-2xl 
+        shadow-2xl 
+        z-40 
+        md:hidden 
+        overflow-hidden
+      "
+            >
+              <div className="flex flex-col divide-y divide-white/10">
+                {Nav_Items.map((i, index) => {
+                  let href;
+                  if (i === "Home") {
+                    href = "/";
+                  } else {
+                    href = `/${i.toLowerCase()}`;
+                  }
+
+                  return (
+                    <Link
+                      key={index}
+                      href={href}
+                      className="px-6 py-4 text-gray-300 hover:bg-white/5"
+                    >
+                      {i}
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {profileOpen && userData && (
+          <>
+            {/* Background Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setProfileOpen(false)}
+              className="fixed inset-0 bg-black z-30 md:hidden"
+            />
+
+            {/* Bottom Sheet Menu */}
+            <motion.div
+              initial={{ y: 400 }}
+              animate={{ y: 0 }}
+              exit={{ y: 400 }}
+              transition={{ type: "spring", damping: 25 }}
+              className="fixed inset-x-0 bottom-0 bg-white rounded-t-2xl shadow-2xl z-50 md:hidden"
+            >
+              <div className="p-5">
+                <p className="font-semibold text-lg">{userData.name}</p>
+                <p className="text-xs uppercase text-gray-500 mb-4">
+                  {userData.role}
+                </p>
+                {userData.role !== "partner" && (
+                  <div className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl">
+                    <div className="flex -space-x-2">
+                      <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
+                        <Bike size={14} />
+                      </div>
+                      <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
+                        <Car size={14} />
+                      </div>
+                      <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
+                        <Truck size={14} />
+                      </div>
+                    </div>
+                    Become a Partner
+                    <ChevronRight size={16} className="ml-auto" />
+                  </div>
+                )}
+
+                <button
+                  className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl mt-2"
+                  onClick={handleLogOut}
+                >
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );
