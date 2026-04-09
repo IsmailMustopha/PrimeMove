@@ -8,7 +8,6 @@ const page = () => {
     <div className='w-full min-h-screen bg-white'>
       <Nav />
       <PublicHome />
-      <Footer />
     </div>
   )
 }
