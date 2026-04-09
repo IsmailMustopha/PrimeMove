@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import React from "react";
 import { Facebook, Instagram, Twitter, Linkedin } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 function Footer() {
   const socialLinks = [
@@ -11,6 +13,8 @@ function Footer() {
     { Icon: Twitter, href: "#" },
     { Icon: Linkedin, href: "#" },
   ];
+
+  const { userData } = useSelector((state: RootState) => state.user);
 
   return (
     <footer className="w-full bg-black text-white">
@@ -23,7 +27,7 @@ function Footer() {
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
           <div>
-            <h2 className="text-2xl font-bold tracking-wide">RYDEX</h2>
+            <h2 className="text-2xl font-bold tracking-wide">PrimeMove</h2>
             <p className="mt-4 text-gray-400 text-sm leading-relaxed">
               Book any vehicle - from bikes to trucks. Trusted owners.
               Transparent pricing.
@@ -41,6 +45,12 @@ function Footer() {
                 </motion.a>
               ))}
             </div>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500 gap-4">
+            <p>© {new Date().getFullYear()} PrimeMove. All rights reserved.</p>
           </div>
         </div>
       </motion.div>

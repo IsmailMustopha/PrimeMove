@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import AuthModal from "@/app/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
@@ -14,6 +14,7 @@ import { setUserData } from "@/redux/userSlice";
 const Nav_Items = ["Home", "Bookings", "About Us", "Contact"];
 
 function Nav() {
+  const router = useRouter()
   const pathName = usePathname();
   const [authOpen, setAuthOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false)
@@ -100,7 +101,12 @@ function Nav() {
                             {userData.role}
                           </p>
                           {userData.role !== "partner" && (
-                            <div className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl">
+                            <div
+                              className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl"
+                              onClick={() =>
+                                router.push("/partner/onboarding/vehicle")
+                              }
+                            >
                               <div className="flex -space-x-2">
                                 <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
                                   <Bike size={14} />
@@ -242,7 +248,10 @@ function Nav() {
                   {userData.role}
                 </p>
                 {userData.role !== "partner" && (
-                  <div className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl">
+                  <div
+                    className="w-full flex items-center gap-3 py-3 hover:bg-gray-100 rounded-xl"
+                    onClick={() => router.push("/partner/onboarding/vehicle")}
+                  >
                     <div className="flex -space-x-2">
                       <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center">
                         <Bike size={14} />
